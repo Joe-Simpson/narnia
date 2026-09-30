@@ -1,0 +1,9 @@
+# Child app repos live alongside this repo on disk but are separate git repos.
+/butters/
+/roaming-nova/
+/skittles/
+/taste-the-rainbow/
+
+node_modules/
+.claude/settings.local.json
+.DS_Store

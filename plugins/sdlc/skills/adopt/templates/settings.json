@@ -1,0 +1,21 @@
+{
+  "extraKnownMarketplaces": {
+    "narnia": {
+      "source": { "source": "github", "repo": "Joe-Simpson/narnia" }
+    }
+  },
+  "enabledPlugins": {
+    "sdlc@narnia": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git branch*)",
+      "Bash(gh issue view*)",
+      "Bash(gh pr view*)"
+    ],
+    "deny": ["Bash(git push --force*)", "Bash(git push -f*)"]
+  }
+}

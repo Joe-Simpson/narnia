@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "narnia",
+  "description": "Shared AI-native SDLC tooling for Joe Simpson's app repos",
+  "owner": {
+    "name": "Joe Simpson"
+  },
+  "plugins": [
+    {
+      "name": "sdlc",
+      "description": "Intent → spec → plan → code → verify: artifact skills, verifier and PR-reviewer agents, and enforcement hooks. Configured per repo via .claude/sdlc.json.",
+      "source": "./plugins/sdlc",
+      "category": "development"
+    }
+  ]
+}

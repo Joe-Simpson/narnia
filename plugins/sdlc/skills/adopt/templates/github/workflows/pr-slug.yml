@@ -1,0 +1,18 @@
+name: PR Slug
+
+# Separate from ci.yml so editing the PR body re-runs only this check.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  slug:
+    uses: Joe-Simpson/narnia/.github/workflows/pr-slug.yml@v1
+    with:
+      src-paths: '{{SRC_PATHS_SPACE_SEPARATED}}'
+      artifact-root: '{{ARTIFACT_ROOT}}'
+      slug-pattern: '{{SLUG_PATTERN}}'

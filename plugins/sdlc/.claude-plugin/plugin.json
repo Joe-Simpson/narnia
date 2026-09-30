@@ -1,0 +1,9 @@
+{
+  "name": "sdlc",
+  "version": "1.0.0",
+  "description": "AI-native SDLC: intent → spec → plan → code → verify. Artifact skills, verifier and PR-reviewer agents, and hooks that enforce the chain. Configured per repo via .claude/sdlc.json; inert in repos without it.",
+  "author": {
+    "name": "Joe Simpson"
+  },
+  "repository": "https://github.com/Joe-Simpson/narnia"
+}

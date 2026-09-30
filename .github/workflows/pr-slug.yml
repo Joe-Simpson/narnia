@@ -1,0 +1,99 @@
+name: PR Slug (reusable)
+
+# Resolves and validates a PR's SDLC slug. Called from each app repo:
+#
+#   jobs:
+#     slug:
+#       uses: Joe-Simpson/narnia/.github/workflows/pr-slug.yml@v1
+#       with:
+#         src-paths: 'src/'
+#
+# Rules (docs/sdlc.md → "Branches & PRs"):
+#   1. Slug comes from the PR body `Slug:` line, else the branch name `<type>/<slug>`
+#   2. `Slug: none` is for tooling/CI/docs PRs and may not touch src-paths
+#   3. A PR touching src-paths needs a committed <artifact-root>/plan/<slug>.md
+
+on:
+  workflow_call:
+    inputs:
+      src-paths:
+        description: Space-separated path prefixes that count as source (e.g. "src/ supabase/")
+        type: string
+        default: 'src/'
+      artifact-root:
+        description: Directory containing intent/, spec/ and plan/
+        type: string
+        default: '.'
+      slug-pattern:
+        description: Extended regex a slug must match
+        type: string
+        default: '^[a-z0-9]+(-[a-z0-9]+)*$'
+      types:
+        description: Pipe-separated branch type prefixes (keep in sync with commitlint type-enum)
+        type: string
+        default: 'feat|fix|test|refactor|perf|docs|chore|ci|build|style|intent|spec|plan'
+
+permissions:
+  contents: read
+
+jobs:
+  slug:
+    name: Resolve SDLC slug
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # PR-controlled values are passed via env only, never interpolated into the script.
+      - name: Check slug
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: origin/${{ github.base_ref }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          SRC_PATHS: ${{ inputs.src-paths }}
+          ARTIFACT_ROOT: ${{ inputs.artifact-root }}
+          SLUG_RE: ${{ inputs.slug-pattern }}
+          TYPES: ${{ inputs.types }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          errors=0
+          fail() { echo "::error::$1"; errors=$((errors + 1)); }
+
+          # 1. PR body "Slug:" line (first match wins; empty value falls through)
+          slug=''; source=''
+          body_line=$(printf '%s\n' "${PR_BODY:-}" | tr -d '\r' | grep -m1 -E '^Slug:' || true)
+          body_value=$(printf '%s' "${body_line#Slug:}" | tr -d '[:space:]')
+          if [[ -n "$body_value" ]]; then
+            slug="$body_value"; source='PR body'
+            if [[ "$slug" != 'none' && ! "$slug" =~ $SLUG_RE ]]; then
+              fail "PR body Slug '$slug' does not match $SLUG_RE"
+            fi
+          fi
+
+          # 2. Branch name <type>/<slug>
+          if [[ -z "$slug" ]]; then
+            if [[ "$HEAD_REF" =~ ^($TYPES)/(.+)$ && "${BASH_REMATCH[2]}" =~ $SLUG_RE ]]; then
+              slug="${HEAD_REF#*/}"; source='branch name'
+            else
+              fail "No slug: add 'Slug: <slug>' (or 'Slug: none') to the PR body, or name the branch <type>/<slug> matching $SLUG_RE"
+            fi
+          fi
+
+          # 3. Source changes need a real slug with a committed plan
+          changed=$(git diff --name-only "$BASE_REF...HEAD")
+          touches_src=false
+          for p in $SRC_PATHS; do
+            if grep -q "^${p}" <<<"$changed"; then touches_src=true; fi
+          done
+          plan="${ARTIFACT_ROOT%/}/plan/$slug.md"; plan="${plan#./}"
+          if [[ -n "$slug" && "$touches_src" == true ]]; then
+            if [[ "$slug" == 'none' ]]; then
+              fail "PR touches source paths ($SRC_PATHS) but Slug is 'none'"
+            elif [[ ! -f "$plan" ]]; then
+              fail "PR touches source paths but $plan does not exist (run /sdlc:generate-plan $slug)"
+            fi
+          fi
+
+          ((errors == 0)) || exit 1
+          echo "Slug: $slug (from $source)"

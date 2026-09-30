@@ -1,0 +1,18 @@
+{
+  "workdir": ".",
+  "srcPaths": ["src/"],
+  "artifactRoot": ".",
+  "slug": { "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "issueLinked": false },
+  "gates": {
+    "typecheck": "npm run typecheck",
+    "lint": "npm run lint",
+    "test": "npm test",
+    "coverage": "npm run test:coverage"
+  },
+  "stopGate": ["typecheck", "lint", "test"],
+  "format": "npx prettier --write",
+  "enforcePlanGate": true,
+  "bugFastPath": true,
+  "stackSkills": [],
+  "securityChecklist": ".claude/security-checklist.md"
+}
