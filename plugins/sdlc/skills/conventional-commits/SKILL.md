@@ -29,9 +29,10 @@ description: Conventional commit format and commit-splitting rules, including th
 
 ## Rules
 
-- Subject is **lowercase**, **imperative** ("add", not "added"), **≤100 chars**, no trailing period
+- Subject **starts lowercase** (proper nouns later are fine), is **imperative** ("add", not "added"), **≤100 chars**, no trailing period
 - Scope is optional: a module (`feat(scoring): …`) or, in issue-linked repos, the issue (`fix(#94): …`)
 - `commitlint` enforces this via the husky `commit-msg` hook where installed — never bypass it with `--no-verify`
+- With squash-merge, the PR title becomes the commit on the default branch — keep PR titles in this format too
 
 ## SDLC artifact commits
 

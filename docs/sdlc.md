@@ -40,7 +40,7 @@ When `bugFastPath` is on, a small, behaviour-restoring bug fix may skip intent a
 
 ## Commits
 
-Conventional commits — `<type>(<scope>): <subject>`, lowercase, imperative, ≤100 chars — with the extra types `intent`, `spec`, `plan`. commitlint enforces this in each repo's husky `commit-msg` hook. See the `conventional-commits` skill.
+Conventional commits — `<type>(<scope>): <subject>`, starting lowercase, imperative, ≤100 chars — with the extra types `intent`, `spec`, `plan`. commitlint enforces this in each repo's husky `commit-msg` hook. See the `conventional-commits` skill.
 
 ## Enforcement
 

@@ -38,9 +38,14 @@ Summarise findings and proposed config values; get the user's confirmation befor
 | `.github/claude-review.md` | `templates/github/claude-review.md` |
 | `.github/pull_request_template.md` | `templates/github/pull_request_template.md` (drop `Closes #` if not issue-driven) |
 | `.github/workflows/pr-slug.yml` | `templates/github/workflows/pr-slug.yml` |
-| `.commitlintrc.js` + `.husky/commit-msg` | `templates/commitlintrc.js`, `templates/husky-commit-msg`; install `@commitlint/cli @commitlint/config-conventional` (and `husky` if absent) as devDependencies in `workdir` |
+| `<workdir>/.commitlintrc.js` + `.husky/commit-msg` (in the active hooks path) | `templates/commitlintrc.js`, `templates/husky-commit-msg`; install `@commitlint/cli @commitlint/config-conventional` (and `husky` if absent) as devDependencies in `workdir` |
 
-husky must be installed from the git root: if `workdir` isn't `.`, the `prepare` script is `cd .. && husky <workdir>/.husky` style — check how the repo already wires husky and extend it rather than replacing it.
+Git hooks run from wherever `git config core.hooksPath` points — check it rather than assuming. If `workdir` isn't `.`, commitlint and its config live in `workdir` (that's where `node_modules` is), so the `commit-msg` hook must make the message path absolute and `cd` there:
+
+```sh
+msg="$1"; case "$msg" in /*) ;; *) msg="$PWD/$msg" ;; esac
+cd <workdir> && npx --no -- commitlint --edit "$msg"
+```
 
 ## 4. Instructions
 

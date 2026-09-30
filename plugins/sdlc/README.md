@@ -26,6 +26,8 @@ Artifact templates are bundled beside their skills (`skills/*/template.md`); a r
 
 ## Agents
 
+Plugin agents are namespaced: spawn them as `sdlc:verifier` and `sdlc:pr-reviewer`.
+
 | Agent | Use it for |
 | ----- | ---------- |
 | `verifier` | Independent PASS/FAIL after implementation: runs the gates, checks plan conformance and acceptance-criteria coverage. Never fixes |
