@@ -19,7 +19,9 @@ A session started in `~/Narnia` is the **hub**: it orchestrates workers across t
 - **Worktrees:** one per worker at `.worktrees/<repo>/<slug>` on `claude/<slug>`. Use `/worktree`.
 - **Dispatch:** `/dispatch <goal>` plans a fan-out (max 5 workers, non-overlapping owned paths), waits for approval, then spawns `repo-worker` agents. Review every diff before merging; verification is the bottleneck.
 - **Overview:** `/hub-status` shows repo, worktree and PR state against the registry.
-- **Stop hook:** blocks ending the session while hippocampus has uncommitted changes that fail `npm run okf:check`.
+- **Handoff:** `/handoff` writes a hub handoff (`hippocampus/handoffs/`, one `open` at a time, linking each repo's `.claude/handoff/<slug>.md`); `/pickup` resumes from it. Repo handoffs are vendored into each repo by `/sdlc:adopt` because cloud sessions don't load plugins (ADR-0005).
+- **Drift from remote work:** `/hub-sync` fetches every repo and reports drift, remote branches carrying handoffs and outdated vendored files, then reconciles the registry on approval. `npm run okf:drift` (in hippocampus) is the offline check. Repo facts live in the repo; hippocampus keeps pointers.
+- **Hooks:** SessionStart prints the open handoff and any drift count; Stop blocks ending the session while hippocampus has uncommitted changes that fail `npm run okf:check`.
 
 ## Rules for plugin content
 

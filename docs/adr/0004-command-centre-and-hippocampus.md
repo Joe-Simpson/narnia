@@ -21,3 +21,4 @@ Alternatives: keep memory in the public Narnia repo (leaks cross-repo notes, mix
 - Cloud and CI runs never see hippocampus or the hub; anything a repo needs alone stays in that repo.
 - The OKF profile is a fork of roaming-nova's and can drift; the decision is recorded in hippocampus `decisions/0001`.
 - Registry entries go stale, so each carries `stale_after` and the checker warns.
+- Cloud sessions also skip plugins, so hub-level and repo-level behaviour that must work remotely is vendored into repos (ADR-0005), not shipped through the plugin.

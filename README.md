@@ -63,4 +63,4 @@ Full process: [docs/sdlc.md](docs/sdlc.md).
 
 ## Command centre
 
-This directory doubles as a hub for orchestrating agents across the app repos. `hippocampus/` (private, gitignored) is the shared memory; `.claude/` holds the hub commands (`/dispatch`, `/worktree`, `/remember`, `/hub-status`), the `repo-worker` agent and the `hippocampus` skill. See [ADR-0004](docs/adr/0004-command-centre-and-hippocampus.md).
+This directory doubles as a hub for orchestrating agents across the app repos. `hippocampus/` (private, gitignored) is the shared memory; `.claude/` holds the hub commands (`/dispatch`, `/worktree`, `/remember`, `/hub-status`, `/hub-sync`, `/handoff`, `/pickup`), the `repo-worker` agent and the `hippocampus` skill. See [ADR-0004](docs/adr/0004-command-centre-and-hippocampus.md) and, for handoff and remote drift, [ADR-0005](docs/adr/0005-handoff-and-drift.md).
