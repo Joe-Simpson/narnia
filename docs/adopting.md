@@ -18,6 +18,12 @@
 5. Open the PR with `Slug: none`; confirm the `PR Slug` check passes
 6. Take one real issue through the full chain as a pilot, and feed friction back into this repo
 
+## Updates consumers must act on
+
+| Plugin version | What to do |
+| -------------- | ---------- |
+| 1.1.0 | Adds the vendored **handoff** skill and hooks (ADR-0005). Existing adopters: re-run `/sdlc:adopt` (or copy `skills/adopt/templates/handoff/` into `.claude/` and merge `settings.hooks.json` into `.claude/settings.json`) and commit. New adopters get it automatically |
+
 ## Migrating an existing variant (roaming-nova, butters)
 
 These repos already have local copies of what the plugin now provides. Migrating means **deleting** the local generic copies and keeping only the stack-specific ones.

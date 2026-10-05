@@ -34,6 +34,7 @@ Enables the plugin (see the README) and holds the repo's permission allow/deny l
 - `.github/workflows/pr-slug.yml` — calls `Joe-Simpson/narnia/.github/workflows/pr-slug.yml@v1`
 - `.commitlintrc.js` + `.husky/commit-msg` — commit format enforcement
 - `intent/`, `spec/`, `plan/` under `artifactRoot`, each with a README
+- `.claude/skills/handoff/`, `.claude/hooks/handoff-{start,stop}.sh`, `.claude/handoff/README.md` — vendored from `skills/adopt/templates/handoff/` (marker `sdlc-handoff vN`) and wired into `.claude/settings.json` hooks. They live in the repo, not the plugin, so they also run in cloud sessions. They need no `sdlc.json` key; the default branch comes from `origin/HEAD` (falling back to `main`/`master`)
 
 ## Optional overrides
 

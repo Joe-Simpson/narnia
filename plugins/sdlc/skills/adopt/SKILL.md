@@ -27,6 +27,7 @@ Summarise findings and proposed config values; get the user's confirmation befor
 | `.claude/sdlc.json` | `templates/sdlc.json` | Fill from the survey. Leave `enforcePlanGate: true` unless the user opts out |
 | `.claude/settings.json` | `templates/settings.json` | Merge into an existing file; add allow rules for each gate command |
 | `.claude/security-checklist.md` | — | Stack-specific checks only (auth model, DB policies, platform secrets). The plugin covers generic web checks |
+| `.claude/skills/handoff/{SKILL.md,template.md}`, `.claude/hooks/handoff-{start,stop}.sh`, `.claude/handoff/README.md` | `templates/handoff/` | **Vendored on purpose.** Cloud sessions (claude.ai/code) don't load plugins, so the handoff skill and hooks must live in the repo itself. Copy them verbatim (keep the `sdlc-handoff vN` markers), `chmod +x` the hooks, and merge `templates/handoff/settings.hooks.json` into `.claude/settings.json` under `hooks` (append to any existing `SessionStart`/`Stop` arrays; don't replace them). Re-running adopt refreshes them |
 | `.claude/skills/<stack>/SKILL.md` | — | One skill per stack area; list each in `stackSkills`. Move gotchas out of `CLAUDE.md` into these |
 
 ## 3. Repo-level files
@@ -55,7 +56,7 @@ cd <workdir> && npx --no -- commitlint --edit "$msg"
 
 ## 5. Verify and commit
 
-- `jq . .claude/sdlc.json .claude/settings.json` parse cleanly; no `{{` left: `grep -rn '{{' .claude REVIEW.md .github intent spec plan`
+- `jq . .claude/sdlc.json .claude/settings.json` parse cleanly; the handoff hooks are executable and `bash -n` clean; no `{{` left: `grep -rn '{{' .claude REVIEW.md .github intent spec plan`
 - Every gate command runs from `workdir`
 - A deliberately bad commit message is rejected by commitlint
 - Commit as `chore: adopt shared sdlc` (split if large: `ci:`, `docs:`, `build:`), open the PR with `Slug: none`, and check the `PR Slug` job passes
