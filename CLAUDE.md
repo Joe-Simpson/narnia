@@ -1,6 +1,6 @@
 # CLAUDE.md — Narnia
 
-> **Scope:** this file is for working on the Narnia repo itself (`plugins/`, `docs/`, `.github/`). If your task is inside an app repo (`butters/`, `roaming-nova/`, `skittles/`, `taste-the-rainbow/`), ignore this file — follow that repo's `CLAUDE.md` and the `sdlc` plugin.
+> **Scope:** this file covers working on the Narnia repo itself (`plugins/`, `docs/`, `.github/`) and the **Command centre** section below (orchestrating from this directory). If your task is inside an app repo (`butters/`, `roaming-nova/`, `skittles/`, `taste-the-rainbow/`), ignore this file — follow that repo's `CLAUDE.md` and the `sdlc` plugin.
 
 Narnia is a Claude Code plugin marketplace that distributes one shared SDLC to several app repos. The app directories beside it are **separate git repos** and are gitignored here — never commit them to Narnia.
 
@@ -10,6 +10,16 @@ Narnia is a Claude Code plugin marketplace that distributes one shared SDLC to s
 - `plugins/sdlc/` — the SDLC plugin (`skills/`, `agents/`, `hooks/`, `.claude-plugin/plugin.json`); its README lists every component
 - `.github/workflows/pr-slug.yml` — reusable workflow, called by app repos as `Joe-Simpson/narnia/.github/workflows/pr-slug.yml@v1`
 - `docs/` — process (`sdlc.md`), consumer contract (`repo-contract.md`), onboarding (`adopting.md`), ADRs
+
+## Command centre
+
+A session started in `~/Narnia` is the **hub**: it orchestrates workers across the app repos and their worktrees. Hub tooling is local-only (see ADR-0004) and lives in `.claude/`; it never changes what an app repo does when run alone.
+
+- **Shared memory:** `hippocampus/` (a separate private git repo, OKF v0.2). Read its `index.md` first and drill down; check `stale_after` before trusting a `Repo` entry. Only the hub writes to it, via `/remember`; workers return a "Proposed memory" block. Rules: `hippocampus/CLAUDE.md`. Use the `hippocampus` skill.
+- **Worktrees:** one per worker at `.worktrees/<repo>/<slug>` on `claude/<slug>`. Use `/worktree`.
+- **Dispatch:** `/dispatch <goal>` plans a fan-out (max 5 workers, non-overlapping owned paths), waits for approval, then spawns `repo-worker` agents. Review every diff before merging; verification is the bottleneck.
+- **Overview:** `/hub-status` shows repo, worktree and PR state against the registry.
+- **Stop hook:** blocks ending the session while hippocampus has uncommitted changes that fail `npm run okf:check`.
 
 ## Rules for plugin content
 

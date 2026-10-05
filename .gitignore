@@ -4,6 +4,10 @@
 /skittles/
 /taste-the-rainbow/
 
+# Private shared memory (its own git repo) and per-worker worktrees.
+/hippocampus/
+/.worktrees/
+
 node_modules/
 .claude/settings.local.json
 .DS_Store

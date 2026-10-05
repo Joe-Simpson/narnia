@@ -60,3 +60,7 @@ Full process: [docs/sdlc.md](docs/sdlc.md).
 - Validate the marketplace: `claude plugin validate ~/Narnia`
 - Hook scripts are plain bash; test them by piping hook JSON on stdin (see `plugins/sdlc/README.md`)
 - Release: bump `plugins/sdlc/.claude-plugin/plugin.json` `version`, commit, tag `vX.Y.Z`, and move the `v1` tag (the reusable workflow is referenced as `@v1`)
+
+## Command centre
+
+This directory doubles as a hub for orchestrating agents across the app repos. `hippocampus/` (private, gitignored) is the shared memory; `.claude/` holds the hub commands (`/dispatch`, `/worktree`, `/remember`, `/hub-status`), the `repo-worker` agent and the `hippocampus` skill. See [ADR-0004](docs/adr/0004-command-centre-and-hippocampus.md).
