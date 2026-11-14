@@ -1,6 +1,6 @@
 # CLAUDE.md — Narnia
 
-> **Scope:** this file covers working on the Narnia repo itself (`plugins/`, `docs/`, `.github/`) and the **Command centre** section below (orchestrating from this directory). If your task is inside an app repo (`butters/`, `roaming-nova/`, `skittles/`, `taste-the-rainbow/`), ignore this file — follow that repo's `CLAUDE.md` and the `sdlc` plugin.
+> **Scope:** this file covers working on the Narnia repo itself (`plugins/`, `docs/`, `.github/`) and the **Command centre** section below (orchestrating from this directory). If your task is inside an app repo (`butters/`, `roaming-nova/`, `skittles/`, `taste-the-rainbow/`), ignore this file — follow that repo's `CLAUDE.md` (all but `taste-the-rainbow/`, which only has a README) and the `sdlc` plugin. `hippocampus/` has its own `CLAUDE.md` too.
 
 Narnia is a Claude Code plugin marketplace that distributes one shared SDLC to several app repos. The app directories beside it are **separate git repos** and are gitignored here — never commit them to Narnia.
 
@@ -10,6 +10,7 @@ Narnia is a Claude Code plugin marketplace that distributes one shared SDLC to s
 - `plugins/sdlc/` — the SDLC plugin (`skills/`, `agents/`, `hooks/`, `.claude-plugin/plugin.json`); its README lists every component
 - `.github/workflows/pr-slug.yml` — reusable workflow, called by app repos as `Joe-Simpson/narnia/.github/workflows/pr-slug.yml@v1`
 - `docs/` — process (`sdlc.md`), consumer contract (`repo-contract.md`), onboarding (`adopting.md`), ADRs
+- `blender-5.2.2-linux-x64/` — unrelated local Blender install, gitignored; not part of the repo
 
 ## Command centre
 
@@ -21,6 +22,7 @@ A session started in `~/Narnia` is the **hub**: it orchestrates workers across t
 - **Overview:** `/hub-status` shows repo, worktree and PR state against the registry.
 - **Handoff:** `/handoff` writes a hub handoff (`hippocampus/handoffs/`, one `open` at a time, linking each repo's `.claude/handoff/<slug>.md`); `/pickup` resumes from it. Repo handoffs are vendored into each repo by `/sdlc:adopt` because cloud sessions don't load plugins (ADR-0005).
 - **Drift from remote work:** `/hub-sync` fetches every repo and reports drift, remote branches carrying handoffs and outdated vendored files, then reconciles the registry on approval. `npm run okf:drift` (in hippocampus) is the offline check. Repo facts live in the repo; hippocampus keeps pointers.
+- **tmux:** `.claude/scripts/hub-tmux.sh` (alias `hub`) opens or attaches the `narnia` session: a `hub` window, one per app repo, one per `.worktrees/` worktree.
 - **Hooks:** SessionStart prints the open handoff and any drift count; Stop blocks ending the session while hippocampus has uncommitted changes that fail `npm run okf:check`.
 
 ## Rules for plugin content
@@ -37,6 +39,13 @@ A session started in `~/Narnia` is the **hub**: it orchestrates workers across t
 ```bash
 claude plugin validate .                          # manifest + plugin structure
 bash plugins/sdlc/hooks/tests/run.sh              # hook behaviour against a scratch repo
+```
+
+Hub hooks and memory (`.claude/`, `hippocampus/`) are checked separately, from inside `hippocampus/`:
+
+```bash
+npm run okf:check    # validates the memory; the Stop hook blocks on failure when there are uncommitted changes
+npm run okf:drift    # offline drift check against the repo registry
 ```
 
 Then smoke-test in an adopted app repo: `claude --plugin-dir ~/Narnia/plugins/sdlc`, check `/sdlc:` completion, `/agents`, and `/hooks`.
