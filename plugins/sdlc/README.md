@@ -42,4 +42,8 @@ Plugin agents are namespaced: spawn them as `sdlc:verifier` and `sdlc:pr-reviewe
 | `format-on-edit.sh` | PostToolUse Write/Edit | never — formats the edited file | `format`, `workdir` |
 | `verify-done.sh` | Stop | Any `stopGate` command fails. Skips on re-entry, when no source changed vs the default branch, or when the same state already passed | `stopGate`, `gates`, `srcPaths`, `workdir` |
 
+### Handoff (vendored, not a plugin hook)
+
+`/sdlc:adopt` copies a `handoff` skill and two hooks (`handoff-start.sh` SessionStart, `handoff-stop.sh` Stop) from `skills/adopt/templates/handoff/` into each repo's own `.claude/`, because cloud sessions don't load plugins. Per branch they keep `.claude/handoff/<slug>.md` current: Stop blocks (exit 2) when the branch has work but its handoff is missing or stale; SessionStart prints it. They need no `sdlc.json` and are tested by `hooks/tests/run.sh`. Version marker: `sdlc-handoff v1`.
+
 Shared helpers are in `hooks/lib/config.sh`. Test the hooks with `bash hooks/tests/run.sh`.

@@ -63,5 +63,10 @@ The process is enforced in layers, so skipping one layer doesn't skip the rule:
 | Stack rules and gotchas | the repo's `.claude/skills/<stack>/` (loaded only when relevant) |
 | Why a decision was made | the repo's `docs/adr/` (`/sdlc:adr`) |
 | Review policy | the repo's `REVIEW.md` |
+| Where a branch stands between sessions | the repo's `.claude/handoff/<slug>.md` (vendored `handoff` skill and hooks) |
 
 When review catches a mistake the instructions should have prevented, fix the instruction (CLAUDE.md or a stack skill) in a prerequisite PR.
+
+## Local versus cloud sessions
+
+Cloud sessions (claude.ai/code) clone one repo and **do not load plugins**, so the plugin's skills (`/sdlc:*`) and hooks (plan gate, push guard, verify-done) only run in local sessions. What a repo commits to its own `.claude/` (skills, agents, commands, and, in a single-repo session, `settings.json` hooks) and `CLAUDE.md` does apply in the cloud. That is why the handoff skill and hooks are vendored into each repo by `/sdlc:adopt` instead of shipped as plugin components. See ADR-0005.

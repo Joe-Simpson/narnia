@@ -4,6 +4,13 @@
 /skittles/
 /taste-the-rainbow/
 
+# Private shared memory (its own git repo) and per-worker worktrees.
+/hippocampus/
+/.worktrees/
+
+# Local Blender install.
+/blender-5.2.2-linux-x64/
+
 node_modules/
 .claude/settings.local.json
 .DS_Store
