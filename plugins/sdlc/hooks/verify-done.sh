@@ -2,8 +2,9 @@
 # Stop hook: run the configured quality gates before the session may end.
 #
 # - Skips on re-entry (stop_hook_active) so a failing gate can't loop forever.
-# - Skips when nothing under srcPaths changed since the last passing run
-#   (marker: .git/sdlc-verified holds "<HEAD sha> <working-tree hash>").
+# - Skips when the content under srcPaths is identical to the last passing run
+#   (marker: <git-dir>/sdlc-verified holds the tree hash of srcPaths, tracked and
+#   untracked, so committing verified work doesn't re-run the gates).
 # - Exit 2 blocks the stop and feeds the failures back to Claude.
 source "$(dirname "$0")/lib/config.sh"
 sdlc_init
@@ -17,15 +18,24 @@ WORKDIR=$(sdlc_cfg "c.workdir || '.'")
 }
 
 mapfile -t SRC < <(sdlc_cfg "c.srcPaths || ['src/']")
-GIT_DIR=$(git rev-parse --git-dir 2>/dev/null) || exit 0
-MARKER="$GIT_DIR/sdlc-verified"
+MARKER=$(git rev-parse --git-path sdlc-verified 2>/dev/null) || exit 0
 UNTRACKED=$(git ls-files --others --exclude-standard -- "${SRC[@]}" 2>/dev/null)
-STATE="$(git rev-parse HEAD 2>/dev/null) $({
-  git diff HEAD -- "${SRC[@]}" 2>/dev/null
-  [ -n "$UNTRACKED" ] && printf '%s\n' "$UNTRACKED" | git hash-object --stdin-paths
-} | git hash-object --stdin)"
 
-[ -f "$MARKER" ] && [ "$(cat "$MARKER")" = "$STATE" ] && exit 0
+# Content hash of srcPaths as they stand on disk, built in a throwaway index so
+# the real one is untouched. Independent of HEAD, so a commit alone is a no-op.
+tree_state() {
+  local idx rc
+  idx=$(mktemp) || return 1
+  cp "$(git rev-parse --git-path index)" "$idx" 2>/dev/null || : >"$idx"
+  GIT_INDEX_FILE="$idx" git add -A -- "${SRC[@]}" >/dev/null 2>&1 &&
+    GIT_INDEX_FILE="$idx" git ls-files -s -- "${SRC[@]}" | git hash-object --stdin
+  rc=$?
+  rm -f "$idx"
+  return $rc
+}
+STATE=$(tree_state 2>/dev/null)
+
+[ -n "$STATE" ] && [ -f "$MARKER" ] && [ "$(cat "$MARKER")" = "$STATE" ] && exit 0
 
 # Nothing to verify if no source changes exist relative to the default branch or the working tree.
 BASE=$(git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD origin/master 2>/dev/null || echo "")
@@ -46,5 +56,5 @@ if [ -n "$FAILURES" ]; then
   exit 2
 fi
 
-echo "$STATE" >"$MARKER"
+[ -n "$STATE" ] && echo "$STATE" >"$MARKER"
 exit 0

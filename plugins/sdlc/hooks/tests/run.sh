@@ -67,6 +67,11 @@ FAILTEST=1 t "new commit" verify-done.sh '{}' 2
 t "passes again" verify-done.sh '{}' 0
 echo c >>app/src/x.ts
 FAILTEST=1 t "tracked file modified" verify-done.sh '{}' 2
+t "passes after edit" verify-done.sh '{}' 0
+git add app && git commit -qm y
+FAILTEST=1 t "commit of verified work: cached" verify-done.sh '{}' 0
+echo d >app/README.md
+FAILTEST=1 t "change outside srcPaths: cached" verify-done.sh '{}' 0
 
 # --- vendored handoff hooks (templates copied into app repos by /sdlc:adopt) ---
 HT="$H/../skills/adopt/templates/handoff/hooks"
